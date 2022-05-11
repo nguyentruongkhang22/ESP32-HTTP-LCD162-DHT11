@@ -19,6 +19,8 @@ int currentState;
 int userState;
 float currentHumi;
 float currentTempC;
+unsigned long previousMillis = 0;
+unsigned long interval = 30000;
 
 void setup()
 {
@@ -184,6 +186,15 @@ void readDHTData()
 
 void loop()
 {
+  unsigned long currentMillis = millis();
+  if ((WiFi.status() != WL_CONNECTED) && (currentMillis - previousMillis >= interval))
+  {
+    Serial.print(millis());
+    Serial.println("Reconnecting to WiFi...");
+    WiFi.disconnect();
+    WiFi.reconnect();
+    previousMillis = currentMillis;
+  }
   httpGet();
   readDHTData();
 }
